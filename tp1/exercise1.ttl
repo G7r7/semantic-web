@@ -1,0 +1,76 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+@prefix ex: <http://turtle.villebon.live/>.
+
+# Types
+ex:person rdf:type rdfs:Class.
+ex:director rdf:subClassOf ex:person.
+ex:actor rdf:subClassOf ex:person.
+ex:year rdf:type rdfs:Class.
+ex:release_date rdf:subClassOf ex:year.
+ex:country rdf:type rdfs:Class.
+ex:movie rdf:type rdfs:Class.
+ex:festival rdf:type rdfs:Class.
+
+# Relations
+ex:hasDirector rdfs:domain ex:movie;
+    rdfs:range ex:director.
+ex:hasReleaseDate rdfs:domain ex:movie;
+    rdfs:range ex:release_date.
+ex:hasPlayedIn rdfs:domain ex:actor;
+    rdfs:range ex:movie.
+ex:wasInFestival rdfs:domain ex:movie;
+    rdfs:range: ex:festival.
+ex:hasYear rdfs:domain ex:festival;
+    rdfs:range ex:year.
+ex:wasInCountry rdfs:domain ex:festival;
+    rdfs:range ex:country.
+
+# Années
+ex:1977 rdf:type ex:year.
+ex:1994 rdf:type ex:year.
+ex:1997 rdf:type ex:year.
+
+# Festival
+ex:FestivalCannes rdf:type ex:festival;
+    ex:hasYear ex:1994;
+    ex:hasYear ex:1997.
+
+# Director
+ex:QuentinT rdf:type ex:director.
+ex:AbbasK rdf:type ex:director.
+ex:JohnB rdf:type ex:director.
+
+# Actor
+ex:JohnT rdf:type ex:actor;
+    ex:hasPlayedIn ex:PulpFiction;
+    ex:hasPlayedIn ex:SaturdayNightFever.
+ex:HomayounE rdf:type ex:actor;
+    ex:hasPlayedIn ex:TasteOfCherry.
+
+# Countries
+ex:USA rdf:type ex:country.
+ex:Iran rdf:type ex:country.
+
+# Films
+ex:PulpFiction rdf:label "Pulp Fiction";
+    rdf:type ex:movie;
+    ex:hasReleaseDate ex:1994;
+    ex:wasInFestival ex:FestivalCannes;
+    ex:wasInCountry ex:USA;
+    ex:hasDirector ex:QuentinT.
+
+
+ex:TasteOfCherry rdf:label "Taste of cherry";
+    rdf:type ex:movie;
+    ex:hasReleaseDate ex:1997;
+    ex:wasInFestival ex:FestivalCannes;
+    ex:wasInCountry ex:Iran;
+    ex:hasDirector ex:AbbasK.
+
+ex:SaturdayNightFever rdf:label "Saturday Night Fever";
+    rdf:type ex:movie;
+    ex:hasReleaseDate ex:1977;
+    ex:hasDirector ex:JohnB.
+
