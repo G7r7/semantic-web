@@ -1,3 +1,4 @@
+# Question 3c
 PREFIX ex: <http://example.org/>
 SELECT ?object ?center
 WHERE {
