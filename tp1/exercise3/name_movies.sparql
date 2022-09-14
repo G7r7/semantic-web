@@ -1,0 +1,11 @@
+PREFIX ex: <http://example.org/movies/>
+PREFIX rdf: <http://www.w3.org/1999/02/22—rdf—syntax—ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?movie ?year ?name
+WHERE {
+    ?movie rdf:type ex:Movie .
+    ?movie ex:year ?year .
+    ?movie rdfs:label ?name .
+    # ?movie rdfs:label "Heat" .
+}
