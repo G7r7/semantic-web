@@ -1,0 +1,11 @@
+# Question 3a
+PREFIX ex: <http://example.org/>
+SELECT ?object
+WHERE {
+    ?object ex:satellite ?satellite .
+    ?satellite ex:name ?name .
+    ?center ex:satellite ?object .
+    ?center ex:radius ?rad .
+    FILTER (langMATCHES(LANG(?name), "en"))
+    FILTER (?rad > 3000)
+}
