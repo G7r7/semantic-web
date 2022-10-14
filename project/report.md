@@ -69,3 +69,56 @@ But when I wanted to list all car names I got only a few hundred names which is 
 I tried typing my car model name on WikiData search bar `Peugeot 107`. I found that the entity assiocated was instead `automobile model (Q3231690)`. So I decided to use this entity instead for my query (see below).
 
 ![](images/wikidata_peugeot_107.png)
+
+Finally I tried to use the `rdfs:label` of the entities to compare them (the duck and the car model). But after multiple unsuccessful results, I found out that the car model `rdfs:label` did not include the car's nickname. So I discovered I could use instead the `skos:altLabel` property of the entities that contained many more nicknames for the entity.
+
+#### Filtering
+
+As a final requirement I needed to filter my result, I wanted to compare only the german `skos:altLabel` of the car with the german `rdfs:label`. So I searched and found the `LANG` function (see below).
+
+```sql
+-- Car
+?model wdt:P31 wd:Q3231690;
+    skos:altLabel ?modelAlias;
+    FILTER(LANG(?modelAlias) = "de").
+
+-- Duck
+wd:Q3736439 rdfs:label ?duckLabel;
+    FILTER(LANG(?duckLabel) = "de").
+```
+#### The query and result
+
+With all the previous work done earlier I finally was able to write a working query that gave me the following result (see below).
+
+```sql
+-- Which car is called a “duck” in German ?
+
+CONSTRUCT {
+    --      instance of    automobile model
+    ?model wdt:P31         wd:Q3231690;
+        skos:altLabel ?modelAlias;
+        rdfs:label ?modelLabel.
+            
+    -- Duck
+    wd:Q3736439 rdfs:label ?duckLabel.
+}
+WHERE 
+{
+    --     instance of     automobile model
+    ?model wdt:P31         wd:Q3231690;
+        skos:altLabel ?modelAlias;
+        rdfs:label ?modelLabel;
+    FILTER(LANG(?modelAlias) = "de").
+    FILTER(LANG(?modelLabel) = "fr").
+    FILTER(STRSTARTS(?duckLabel, ?modelAlias)).
+            
+    -- Duck
+    wd:Q3736439 rdfs:label ?duckLabel;
+        FILTER(LANG(?duckLabel) = "de").
+    
+}
+```
+
+![](images/question1_graph.png)
+
+Here we can see that the car found is the `Citroën 2CV`. They both have a label and/or an alias wich begin with the string `Ente`.
