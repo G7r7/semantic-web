@@ -118,7 +118,136 @@ WHERE
     
 }
 ```
-
 ![](images/question1_graph.png)
 
 Here we can see that the car found is the `Citroën 2CV`. They both have a label and/or an alias wich begin with the string `Ente`.
+
+## Question 2
+
+### Problem I want to solve
+With what other famous people did Barck Obama studied throughout his life ?
+
+### Data source
+
+For this question I will use the same data source as the previous question: WikiData.
+
+### Entities I need
+
+For this question I will need the following entities:
+
+- Barack Obama `Q76`
+- Human `Q5`
+
+### Relations I need
+
+For this question I will need the following relations:
+
+- educated at `P69`
+
+### My experiments
+
+#### Listing the schools of Barack Obama
+
+To list the schools of Barack Obama I used the following query:
+
+```sql
+%%rdf sparql --endpoint https://query.wikidata.org/sparql
+
+# With what other famous people did Barck Obama studied throughout his life ?
+
+SELECT ?schoolLabel
+WHERE 
+{
+    # Barrack Obama   # Educated At
+    wd:Q76            wdt:P69          ?school.
+    ?school rdfs:label ?schoolLabel;
+        FILTER(LANG(?schoolLabel) = "en"). 
+}
+```
+
+## Listing 100 people who have studied at the same school as Barack Obama
+
+To list 100 people who have studied at the same school as Barack Obama I used the following query:
+
+```sql
+%%rdf sparql --endpoint https://query.wikidata.org/sparql
+
+-- With what other famous people did Barck Obama studied throughout his life ?
+
+SELECT ?personName
+WHERE 
+{
+    -- Barrack Obama   -- Educated At
+    wd:Q76            wdt:P69          ?school.
+    ?school rdfs:label ?schoolLabel;
+    FILTER(LANG(?schoolLabel) = "en").
+    
+            -- instance of  -- Human  
+    ?person wdt:P31        wd:Q5;
+        -- Educated At
+        wdt:P69         ?school2;
+        rdfs:label ?personName.
+    FILTER(LANG(?personName) = "en").
+    FILTER(?school = ?school2).
+}
+LIMIT 100
+```
+
+ ### Problem encountered
+
+
+#### Filtering with date
+
+ When I tried to filter the result to only keep the people who studied has Barack Obama did, It became harder for me. The relation `educated at` had a qualifier `start time` but I didn't know how to use it. So I had to look up WikiData documentation to find out how to use it.
+
+ After reading the documentation I found an example describing a similar problem to mine. So I tried to use it in my query and after mutiple tries I finally got a working query.
+
+```sql
+    --! Educated At
+    ?person p:P69 [
+            --! Educated At
+            ps:P69 ?school;
+            --! Start Time
+            pq:P580 ?date
+        ];
+```
+
+ #### Removing Barack Obama from the results
+
+I also wanted to remove Barack Obama from the result, because Barack Obama indeed studied in the same school and at the same period that Barack Obama. So I had to find a way to remove him from the result. I tried to use the `FILTER`.
+
+```sql
+FILTER(?person != wd:Q76).
+```
+
+ ### The query and result
+
+# With what other famous people did Barck Obama studied throughout his life ?
+
+```sql
+SELECT DISTINCT ?personName ?date ?schoolLabel
+WHERE 
+{
+    # Barrack Obama   # Educated At
+    wd:Q76            p:P69        [
+            ps:P69 ?school;
+            pq:P580 ?date
+    ].
+   
+            # instance of  # Human  
+    ?person wdt:P31        wd:Q5.
+            
+        # Educated At
+    ?person p:P69 [
+            ps:P69 ?school;
+            pq:P580 ?date
+        ];
+        rdfs:label ?personName.
+    
+   
+    ?school rdfs:label ?schoolLabel;
+        FILTER(LANG(?schoolLabel) = "en"). 
+    FILTER(LANG(?personName) = "en").
+  FILTER(?person != wd:Q76).
+}
+```
