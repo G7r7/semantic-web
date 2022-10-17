@@ -165,7 +165,7 @@ WHERE
 }
 ```
 
-## Listing 100 people who have studied at the same school as Barack Obama
+### Listing 100 people who have studied at the same school as Barack Obama
 
 To list 100 people who have studied at the same school as Barack Obama I used the following query:
 
